@@ -17,6 +17,7 @@ if (isset($_REQUEST['GLOBALS']) OR isset($_REQUEST['absoluteurl']) OR isset($_RE
 
 include("config.php");
 include($absoluteurl."core/functions.php");
+include($absoluteurl."components/HTTP_Download2/HTTP/Download2.php")
 
 
 $filename = $_GET['filename'];
@@ -45,16 +46,16 @@ if (file_exists($filename_path) ) {
 		if(ini_get('zlib.output_compression'))
 			ini_set('zlib.output_compression', 'Off');
 		###
-
-		header("Pragma: public"); // required
-		header("Expires: 0");
-		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Cache-Control: private",false); // required for certain browsers 
-		header("Content-Type: $filemimetype");
-		header("Content-Disposition: attachment; filename=".basename($filename_path).";" );
-		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: ".filesize($filename_path));
-		readfile("$filename_path");
+                $params = array(
+                'file'                => $filename_path,
+                'contenttype'         => $filemimetype,
+                'contentdisposition'  => array('attachment', basename($filename_path))
+                 );
+  
+                $error = HTTP_Download::staticSend($params, false);		
+		
+		
+		
 		exit();	
 	}
 }
